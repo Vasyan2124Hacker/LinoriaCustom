@@ -3639,10 +3639,10 @@ function Library:CreateWindow(...)
 	Library:GiveSignal(InputService.InputBegan:Connect(function(Input, Processed)
 		if type(Library.PanicKeybind) == 'table' and Library.PanicKeybind.Type == 'KeyPicker' then
 			if Input.UserInputType == Enum.UserInputType.Keyboard and Input.KeyCode.Name == Library.PanicKeybind.Value then
-				pcall(shared._unload)
+				ScreenGui:Destroy()
 			end
 		elseif Input.KeyCode == Enum.KeyCode.RightControl or (Input.KeyCode == Enum.KeyCode.RightShift and (not Processed)) then
-			pcall(shared._unload)
+			ScreenGui:Destroy()
 		end
 	end))
 
