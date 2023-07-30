@@ -136,7 +136,6 @@ do
 	shared.threads = {}
 	shared.callbacks = {}
 
-	shared._id = httpService:GenerateGUID(false)
 end
 
 function Library:AttemptSave()
