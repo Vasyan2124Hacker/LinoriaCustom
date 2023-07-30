@@ -112,20 +112,31 @@ function Library:SafeCallback(f, ...)
 	end;
 end;
 
-function shared._unload()
-	if shared._id then
+do
+	if shared._unload then
+		pcall(shared._unload)
+	end
+
+	function shared._unload()
+		if shared._id then
 			pcall(runService.UnbindFromRenderStep, runService, shared._id)
-	end
+		end
 
-	UI:Unload()
+		UI:Unload()
 
-	for i = 1, #shared.threads do
+		for i = 1, #shared.threads do
 			coroutine.close(shared.threads[i])
+		end
+
+		for i = 1, #shared.callbacks do
+			task.spawn(shared.callbacks[i])
+		end
 	end
 
-	for i = 1, #shared.callbacks do
-			task.spawn(shared.callbacks[i])
-	end
+	shared.threads = {}
+	shared.callbacks = {}
+
+	shared._id = httpService:GenerateGUID(false)
 end
 
 function Library:AttemptSave()
@@ -3639,10 +3650,10 @@ function Library:CreateWindow(...)
 	Library:GiveSignal(InputService.InputBegan:Connect(function(Input, Processed)
 		if type(Library.PanicKeybind) == 'table' and Library.PanicKeybind.Type == 'KeyPicker' then
 			if Input.UserInputType == Enum.UserInputType.Keyboard and Input.KeyCode.Name == Library.PanicKeybind.Value then
-				ScreenGui:Destroy()
+				pcall(shared._unload)
 			end
 		elseif Input.KeyCode == Enum.KeyCode.RightControl or (Input.KeyCode == Enum.KeyCode.RightShift and (not Processed)) then
-			ScreenGui:Destroy()
+			pcall(shared._unload)
 		end
 	end))
 
