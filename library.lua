@@ -112,6 +112,22 @@ function Library:SafeCallback(f, ...)
 	end;
 end;
 
+function shared._unload()
+	if shared._id then
+			pcall(runService.UnbindFromRenderStep, runService, shared._id)
+	end
+
+	UI:Unload()
+
+	for i = 1, #shared.threads do
+			coroutine.close(shared.threads[i])
+	end
+
+	for i = 1, #shared.callbacks do
+			task.spawn(shared.callbacks[i])
+	end
+end
+
 function Library:AttemptSave()
 	if Library.SaveManager then
 		Library.SaveManager:Save();
@@ -3623,10 +3639,10 @@ function Library:CreateWindow(...)
 	Library:GiveSignal(InputService.InputBegan:Connect(function(Input, Processed)
 		if type(Library.PanicKeybind) == 'table' and Library.PanicKeybind.Type == 'KeyPicker' then
 			if Input.UserInputType == Enum.UserInputType.Keyboard and Input.KeyCode.Name == Library.PanicKeybind.Value then
-				task.spawn(Library.Unload)
+				pcall(shared._unload)
 			end
 		elseif Input.KeyCode == Enum.KeyCode.RightControl or (Input.KeyCode == Enum.KeyCode.RightShift and (not Processed)) then
-			task.spawn(Library.Unload)
+			pcall(shared._unload)
 		end
 	end))
 
