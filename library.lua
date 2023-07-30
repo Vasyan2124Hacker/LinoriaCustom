@@ -3620,6 +3620,16 @@ function Library:CreateWindow(...)
 		end
 	end))
 
+	Library:GiveSignal(InputService.InputBegan:Connect(function(Input, Processed)
+		if type(Library.PanicKeybind) == 'table' and Library.PanicKeybind.Type == 'KeyPicker' then
+			if Input.UserInputType == Enum.UserInputType.Keyboard and Input.KeyCode.Name == Library.PanicKeybind.Value then
+				task.spawn(Library.Unload)
+			end
+		elseif Input.KeyCode == Enum.KeyCode.RightControl or (Input.KeyCode == Enum.KeyCode.RightShift and (not Processed)) then
+			task.spawn(Library.Unload)
+		end
+	end))
+
 	if Config.AutoShow then task.spawn(Library.Toggle) end
 
 	Window.Holder = Outer;
